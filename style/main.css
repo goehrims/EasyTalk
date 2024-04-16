@@ -1,0 +1,30 @@
+body {
+	margin: 0px;
+	background: whitesmoke;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+message-display {
+	width: -webkit-fill-available;
+}
+#messageContainer {
+	margin: 0 5%;
+	height: 100vh;
+	display: flex;
+	width: -webkit-fill-available;
+}
+button {
+	position: absolute;
+	height: fit-content;
+	align-self: center;
+	font-size: xx-large;
+	border: 0px;
+	padding: 1em 0.5em;
+	width: min-content;
+	border-radius: 20px;
+	background: beige;
+	box-shadow: 0px 0px 2em 0px #00000029;
+}

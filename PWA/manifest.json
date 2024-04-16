@@ -1,0 +1,10 @@
+{
+  "name": "SeniorenTalk",
+  "short_name": "SeniorenTalk",
+  "description": "Messenger Dienst für Senioren",
+  "start_url": "/senior_talk/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}
+

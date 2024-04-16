@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="icon" href="/core/img/favicon.ico">
+        <link rel="manifest" href="/senior_talk/PWA/manifest.json">
+        <title></title>
+
+	<link rel='stylesheet' href='style/main.css'>
+    </head>
+    <body>
+        <script src="data/indexDB.js"></script> 
+        <script src="components/Message.js"></script> 
+        <script src="components/Reply.js"></script> 
+        <script src="components/Toastr.js"></script>
+        <script src="components/Config.js"></script>
+        <div style='display:flex; height: 100%'>
+            <button style='left: 1%' onclick='nextMessage()' id='nextButton' disabled>
+                Nächste Nachricht
+            </button>
+            <div id="messageContainer" style="height: 100%; display: flex; width: -webkit-fill-available;">
+            </div>
+            <button style='right: 1%' onclick='prevMessage()' id='prevButton'>
+                Vorherige Nachricht
+            </button>
+        <div>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/senior_talk/service-worker.js', {scope: './'})
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                        if (navigator.storage && navigator.storage.persist) {
+                            requestStorage();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+                });
+            }
+
+            async function requestStorage() {
+                const isPersisted = await navigator.storage.persist();
+                console.log(`Persisted storage granted: ${isPersisted}`);
+            }
+
+            function reply(messageID) {
+                var send = document.createElement('reply-message');
+                send.setAttribute('messageID', messageID);
+                send.sendMessage = sendMessage;
+                document.body.appendChild(send);
+            }
+
+            function prevMessage() {
+                currentIndex = (currentIndex - 1 + messages.length) % messages.length;
+                updateMessageDisplay();
+                if (currentIndex == 0) {
+                    document.getElementById('prevButton').disabled = true;
+                }
+                document.getElementById('nextButton').disabled = false;
+            }
+
+            function nextMessage() {
+                currentIndex = (currentIndex + 1 + messages.length) % messages.length;
+                updateMessageDisplay();
+                if (currentIndex == messages.length - 1) {
+                    document.getElementById('nextButton').disabled = true;
+                }
+                document.getElementById('prevButton').disabled = false;
+                updateMessages();
+            }
+
+            function updateMessageDisplay() {
+                messageElement.setAttribute('author', messages[currentIndex].actorDisplayName);
+                messageElement.setAttribute('date', messages[currentIndex].timestamp);
+                messageElement.setAttribute('content', messages[currentIndex].message);
+                messageElement.setAttribute('messageID', messages[currentIndex].id);
+                messageElement.setAttribute('parameters', JSON.stringify(messages[currentIndex].messageParameters));
+                messageElement.replyToMessage = reply;
+                messageElement.render();
+                markChatAsRead(messages[currentIndex].id);
+            }
+
+            async function sendMessage(message, messageReplyID) {
+                var messagesProm = await fetch(url + "/ocs/v2.php/apps/spreed/api/v1/chat/" + chatToken + "?message=" + message + "&replyTo=" + messageReplyID, {
+                    method: "POST",
+                    headers: {
+                        "requesttoken": requestToken,
+                    },
+                });
+                if (messagesProm.ok) {
+                    toastr.show('success', "Nachricht wurde erfolgreich gesendet!", 3000);
+                }
+                updateMessages();
+            }
+
+            async function markChatAsRead(messageID) {
+                if (messageID > lastReadMessage) {
+                    lastReadMessage = messageID;
+                    // update the chat to mark as read
+                    var messagesProm = await fetch(url + "/ocs/v2.php/apps/spreed/api/v1/chat/" + chatToken + "/read?lastReadMessage=" + messageID, {
+                        method: "POST",
+                        headers: {
+                            "requesttoken": requestToken,
+                        },
+                    });
+                    console.log("message is red");
+                }
+                var reactProm = await fetch(url + "/ocs/v2.php/apps/spreed/api/v1/reaction/" + chatToken + "/" + messageID + "?reaction=👴", {
+                    method: "POST",
+                    headers: {
+                        "requesttoken": requestToken,
+                    },
+                });
+            }
+
+            async function login() {
+                var login = fetch(url + "/index.php/login", {
+                    method: "GET",
+                    mode: "same-origin",
+                    headers: {
+                        "content-type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": "Basic " + accessToken,
+                    },
+                    redirect: "manual",
+                    credentials: "include",
+                    referrerPolicy: "same-origin"
+                });
+                return login;
+            }
+
+            async function getRequestToken() {
+                var dashboardProm = await fetch(url + "/index.php/apps/dashboard/", {
+                    method: "GET",
+                    mode: "cors",
+                    headers: {
+                        "Authorization": "Basic " + accessToken,
+                    },
+                });
+                if (dashboardProm.ok) {
+                    let dashboard = await dashboardProm.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(dashboard, 'text/html');
+                    const headElement = doc.head;
+
+                    requestToken = headElement.dataset.requesttoken;
+                }
+                return requestToken;
+            }
+
+            async function updateMessages() {
+                var lastKnownMessageID = messages[messages.length - 1].id;
+                let actualMessages = await fetchMessages();
+
+                actualMessages.forEach((message) => {
+                    if (message.id > lastKnownMessageID) {
+                        console.log("new massaged is adeed");
+                        document.getElementById('nextButton').disabled = false;
+                        messages.push(message);
+                    }
+                });
+                setTimeout(updateMessages,300000);
+            }
+
+            async function fetchMessages() {
+                var messagesProm = await fetch(url + "/ocs/v2.php/apps/spreed/api/v1/chat/" + chatToken + "?lookIntoFuture=0", {
+                    method: "GET",
+                    mode: "cors",
+                    headers: {
+                        "content-type": "application/json",
+                        "Accept": "application/json",
+                        "requesttoken": requestToken,
+                    },
+                    redirect: "follow",
+                    credentials: "include",
+                    referrerPolicy: "no-referrer"
+                });
+                if (messagesProm.ok) {
+                    let _messages = await messagesProm.json();
+                    _messages = _messages['ocs']['data'].filter(message => message.messageType == 'comment');
+                    return _messages.reverse();
+                }
+            }
+
+            async function fetchAll() {
+                var loginProm = await login();
+                if (loginProm.ok) {
+                    await getRequestToken();
+                    messages = await fetchMessages();
+                    currentIndex = messages.length - 1;
+                    updateMessageDisplay();
+                }
+                else {
+                    if (loginProm.status === 401) {
+                        // unauthorized code
+                        clearData(function(event){});
+                        toastr.show("error", "Anmeldung fehlgeschlagen", 3000);
+                    }
+                    else if(loginProm.type === 'opaqueredirect') {
+                        await getRequestToken();
+                        messages = await fetchMessages();
+                        currentIndex = messages.length - 1;
+                        updateMessageDisplay();
+                    }
+                    else{
+                        clearData(function(event) {});
+                    }
+                }
+            }
+
+            function getConfig(error, data) {
+                if (error) {
+                    console.error('Error reading data:', error);
+                    return;
+                }
+
+                if (data.length == 0) {
+                    var config = document.createElement('config-dialog');
+                    config.saveConfig = function(data) {
+                        chatToken = data['chatToken'];
+                        accessToken = btoa(data['username'] + ":" + data['password']);
+                        addData(accessToken, chatToken);
+                        fetchAll();
+                    };
+                    document.body.appendChild(config);
+                }
+                else {
+                    chatToken = data[0]['chatToken'];
+                    accessToken = data[0]['accessToken'];
+                    fetchAll();
+                }
+            }
+
+            const url = location.origin;
+            let chatToken = '';
+            let accessToken = ''; 
+            var requestToken = '';
+            let messages = [];
+            let currentIndex = 0;
+            const messageElement = document.createElement('message-display');
+            const container = document.getElementById('messageContainer');
+            container.appendChild(messageElement);
+            messageElement.login = login;
+            const toastr = document.createElement('toast-message');
+            document.body.appendChild(toastr);
+
+            var lastReadMessage = 0;
+
+            document.addEventListener("DOMContentLoaded", function(event) {
+                readData(getConfig);
+                setTimeout(updateMessages, 300000);
+            });
+        </script>
+    </body>
+</html>
