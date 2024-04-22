@@ -15,7 +15,7 @@
         <script src="components/Toastr.js"></script>
         <script src="components/Config.js"></script>
         <div style='display:flex; height: 100%'>
-            <button style='left: 1%' onclick='nextMessage()' id='nextButton' disabled>
+            <button style='left: 1%; display: none;' onclick='nextMessage()' id='nextButton' disabled>
                 Nächste Nachricht
             </button>
             <div id="messageContainer" style="height: 100%; display: flex; width: -webkit-fill-available;">
@@ -57,8 +57,10 @@
                 updateMessageDisplay();
                 if (currentIndex == 0) {
                     document.getElementById('prevButton').disabled = true;
+                    document.getElementById('prevButton').style.display = 'none';
                 }
                 document.getElementById('nextButton').disabled = false;
+                document.getElementById('nextButton').style.display = 'block';
             }
 
             function nextMessage() {
@@ -66,8 +68,10 @@
                 updateMessageDisplay();
                 if (currentIndex == messages.length - 1) {
                     document.getElementById('nextButton').disabled = true;
+                    document.getElementById('nextButton').style.display='none';
                 }
                 document.getElementById('prevButton').disabled = false;
+                document.getElementById('prevButton').style.display='block';
                 updateMessages();
             }
 
@@ -158,6 +162,7 @@
                     if (message.id > lastKnownMessageID) {
                         console.log("new massaged is adeed");
                         document.getElementById('nextButton').disabled = false;
+                        document.getElementById('nextButton').style.display = 'block';
                         messages.push(message);
                     }
                 });
