@@ -38,16 +38,16 @@ class MessageReply extends HTMLElement {
             }
             .textarea{
                 background: whitesmoke;
-                padding: 1em;
+                padding: 1vh 1vw;
                 border-radius: 20px;
                 margin: auto;
                 font-size: xx-large;
-                min-width: 60%;
+                min-width: 90%;
             }
             textarea {
                 margin-top: 1em;
-                width: 100%;
-                min-height: 16em;
+                //width: 100%;
+                height: 10vh;
                 border: none;
                 border-radius: 10px;
                 font-size: xx-large;
