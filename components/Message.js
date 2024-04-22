@@ -79,13 +79,19 @@
                 max-height:100%;
                 max-width: 100%;
             }
+            .newIndicator {
+                color: crimson;
+                font-size: xx-large;
+                font-weight: bold;
+            }
             </style>
             <div class="message">
                 <div class='d-flex'>
                   <div class="author">Autor:</div>
+                  <div class="newIndicator"></div>
                   <div class="date">Datum:</div>
                 </div>
-                <div class="content">Nachricht:</div>
+                <div class="content">Nachricht lädt...</div>
                 <div class="replybutton btn">Antworten</div>
             </div>
             `;
@@ -98,7 +104,7 @@
 
      // Define properties for author, date, and content
      static get observedAttributes() {
-         return ['author', 'date', 'content', 'messageID', 'parameters'];
+         return ['author', 'date', 'content', 'messageID', 'parameters', 'reactionsSelf'];
      }
 
      attributeChangedCallback(name, oldValue, newValue) {
@@ -131,6 +137,8 @@
          const authorElement = this.shadowRoot.querySelector('.author');
          const dateElement = this.shadowRoot.querySelector('.date');
          const contentElement = this.shadowRoot.querySelector('.content');
+         const newMessageIndicator = this.shadowRoot.querySelector('.newIndicator');
+
          contentElement.innerHTML = '';
          let parameters = {};
 
@@ -147,6 +155,11 @@
              let dateString = date.toLocaleDateString() + " " + date.getUTCHours() + ":" + date.getMinutes();
              dateElement.textContent = dateString;
          }
+         if (this.hasAttribute('reactionsSelf')) {
+            if (this.getAttribute('reactionsSelf').indexOf('👴') >= 0) {
+                newMessageIndicator.textContent = 'NEU';
+            }
+         }
          if (this.hasAttribute('content')) {
              let contentShow = false;
              if (this.getAttribute('content') !== '{file}') {
@@ -156,6 +169,7 @@
                  contentElement.innerHTML = '';
              }
              if (parameters.file) {
+                 contentElement.innerHTML = '<p>Nachricht lädt</p>';
                  contentShow = this.loadMediaContent(parameters.file, contentShow);
              } else {
                  contentElement.style.backgroundImage = 'unset';
@@ -171,6 +185,7 @@
          if (fileParams.mimetype.indexOf("image") >= 0) {
              contentElement.style.backgroundImage = 'url("' + location.origin + '/index.php/core/preview?fileId=' + fileParams.id + '&y=' + fileParams.height / 2 + '&x=' + fileParams.width / 2 + '&a=true&etag=' + fileParams.etag + '")';
              contentShow = true;
+             contentElement.innerHTML = '';
          } else if (fileParams.mimetype.indexOf("video") >= 0) {
              // login again?
              let videoURL = location.origin + "/remote.php/dav/files/Marius/" + fileParams.path;
@@ -196,6 +211,7 @@
                      videoElement.src = videoObjectURL;
                      videoElement.autoplay = true;
                      videoElement.controls = true;
+                     contentElement.innerHTML = '';
                      contentElement.appendChild(videoElement);
                  })
                  .catch(error => {
