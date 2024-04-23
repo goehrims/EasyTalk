@@ -1,9 +1,9 @@
 const CACHE_NAME = 'senior-talk-cache';
 const urlsToCache = [
     '/senior_talk/style/main.css',
-    '/senior_talk/components/Reply.js',
+    //'/senior_talk/components/Reply.js',
     //'/senior_talk/components/Message.js',
-    '/senior_talk/components/Toastr.js',
+    //'/senior_talk/components/Toastr.js',
 ];
 
 self.addEventListener('install', event => {

@@ -29,11 +29,12 @@ function createDatabase(event) {
 
     // Add an index
     objectStore.createIndex('accessToken', 'accessToken', { unique: false });
+    objectStore.createIndex('webdav', 'webdav', { unique: true });
     objectStore.createIndex('chatToken', 'chatToken', { unique: false });
 }
 
 // Function to add data to the database
-function addData(accessToken, chatToken) {
+function addData(accessToken, webdav, chatToken) {
     const request = indexedDB.open('seniorTalkData', 1);
     
 	request.onupgradeneeded = createDatabase;
@@ -41,7 +42,7 @@ function addData(accessToken, chatToken) {
         const db = event.target.result;
         const transaction = db.transaction(['credentials'], 'readwrite');
         const objectStore = transaction.objectStore('credentials');
-        const addRequest = objectStore.add({ accessToken, chatToken });
+        const addRequest = objectStore.add({ accessToken, webdav, chatToken });
 
         addRequest.onsuccess = function() {
             console.log('Data added successfully');

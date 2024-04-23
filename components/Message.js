@@ -104,12 +104,13 @@
 
      // Define properties for author, date, and content
      static get observedAttributes() {
-         return ['author', 'date', 'content', 'messageID', 'parameters', 'reactionsSelf'];
+         return ['author', 'date', 'content', 'messageID', 'parameters', 'reactionsSelf', 'webdav'];
      }
 
      attributeChangedCallback(name, oldValue, newValue) {
-         if (oldValue !== newValue) {
-             //this.render();
+         if (oldValue !== newValue && name =='webdav') {
+            this.webdav = this.getAttribute('webdav');
+             console.log(this);
          }
      }
 
@@ -122,7 +123,9 @@
                  console.warn("reply is not a function");
              }
          });
-         //this.render();
+         if (this.hasAttribute('webdav')) {
+             this.webdav = this.getAttribute('webdav');
+         }
      }
 
      set replyToMessage(func) {
@@ -188,7 +191,7 @@
              contentElement.innerHTML = '';
          } else if (fileParams.mimetype.indexOf("video") >= 0) {
              // login again?
-             let videoURL = location.origin + "/remote.php/dav/files/Marius/" + fileParams.path;
+             let videoURL = this.webdav + fileParams.path;
              fetch(videoURL, {
                      headers: {
                          'Authorization': `Bearer ${accessToken}`

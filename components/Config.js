@@ -55,6 +55,10 @@
             </style>
             <div class="message">
                 <div class='d-flex'>
+                    <label for='webdav'>Webdav</label>
+                    <input type='text' name='webdav'>
+                </div>
+                <div class='d-flex'>
                     <label for='username'>Username</label>
                     <input type='text' name='username'>
                 </div>
@@ -86,7 +90,7 @@
          var button = this.shadowRoot.querySelector('.saveButton');
          button.addEventListener('click', () => {
              if (typeof this.saveConfig === 'function') {
-                 this.saveConfig({"username": this.shadowRoot.querySelector('input[name="username"]').value,"password": this.shadowRoot.querySelector('input[name="password"]').value,"chatToken": this.shadowRoot.querySelector('input[name="chat"]').value});
+                 this.saveConfig({"username": this.shadowRoot.querySelector('input[name="username"]').value,"password": this.shadowRoot.querySelector('input[name="password"]').value,"webdav": this.shadowRoot.querySelector('input[name="webdav"]').value, "chatToken": this.shadowRoot.querySelector('input[name="chat"]').value});
                  this.remove();
              } else {
                  console.warn("reply is not a function");

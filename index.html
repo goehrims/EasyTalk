@@ -227,7 +227,7 @@
                     config.saveConfig = function(data) {
                         chatToken = data['chatToken'];
                         accessToken = btoa(data['username'] + ":" + data['password']);
-                        addData(accessToken, chatToken);
+                        addData(accessToken, data['webdav'], chatToken);
                         fetchAll();
                     };
                     document.body.appendChild(config);
@@ -235,6 +235,8 @@
                 else {
                     chatToken = data[0]['chatToken'];
                     accessToken = data[0]['accessToken'];
+                    webdav = data[0]['webdav'];
+                    messageElement.webdav = webdav;
                     fetchAll();
                 }
             }
@@ -243,6 +245,7 @@
             let chatToken = '';
             let accessToken = ''; 
             var requestToken = '';
+            var webdav = '';
             let messages = [];
             let currentIndex = 0;
             const messageElement = document.createElement('message-display');
