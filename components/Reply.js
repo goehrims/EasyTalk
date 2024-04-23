@@ -46,7 +46,7 @@ class MessageReply extends HTMLElement {
             }
             textarea {
                 margin-top: 1em;
-                //width: 100%;
+                width: 100%;
                 height: 10vh;
                 border: none;
                 border-radius: 10px;

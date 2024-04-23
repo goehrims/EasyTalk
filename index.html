@@ -3,7 +3,7 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <link rel="icon" href="/core/img/favicon.ico">
-        <link rel="manifest" href="/senior_talk/PWA/manifest.json">
+        <link rel="manifest" href="PWA/manifest.json">
         <title></title>
 
 	<link rel='stylesheet' href='style/main.css'>
@@ -27,7 +27,7 @@
         <script>
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/senior_talk/service-worker.js', {scope: './'})
+                    navigator.serviceWorker.register('service-worker.js') 
                     .then(registration => {
                         console.log('Service Worker registered with scope:', registration.scope);
                         if (navigator.storage && navigator.storage.persist) {
