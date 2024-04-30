@@ -1,0 +1,11 @@
+{
+    "require": {
+        "cboden/ratchet": "^0.4.4",
+	"phrity/websocket": "2.2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "OCA\\EasyTalk\\": "lib/"
+        }
+    }
+}
