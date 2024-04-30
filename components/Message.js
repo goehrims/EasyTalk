@@ -159,7 +159,7 @@
              dateElement.textContent = dateString;
          }
          if (this.hasAttribute('reactionsSelf')) {
-            if (this.getAttribute('reactionsSelf').indexOf('👴') >= 0) {
+            if (this.getAttribute('reactionsSelf').indexOf('👴') < 0) {
                 newMessageIndicator.textContent = 'NEU';
             }
          }
