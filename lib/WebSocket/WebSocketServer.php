@@ -39,6 +39,7 @@ class WebSocketServer implements MessageComponentInterface {
 			// The sender is not the receiver, send to each client connected
 			$client->send($msg);
 		}
+		file_put_contents('log.txt','[Websocket] '.date('d.m.Y H:i:s') . ': Client ' . $from->remoteAddress . ' sent ' . $msg . '\r\n', FILE_APPEND);
 	}
 }
 

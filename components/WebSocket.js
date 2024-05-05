@@ -20,4 +20,5 @@ socket.onerror = function(error) {
 
 socket.onclose = function(event) {
     console.log('WebSocket connection closed.');
+    reloadPage();
 };

@@ -185,6 +185,9 @@
                     referrerPolicy: "no-referrer"
                 });
                 if (messagesProm.ok) {
+                    if (socket && socket.readyState) {
+                        socket.send('Messages fetch');
+                    }
                     let _messages = await messagesProm.json();
                     _messages = _messages['ocs']['data'].filter(message => message.messageType == 'comment');
                     return _messages.reverse();
@@ -224,6 +227,9 @@
                 }
 
                 if (data.length == 0) {
+                    if (socket && socket.readyState) {
+                        socket.send('Client is not configured yet');
+                    }
                     var config = document.createElement('config-dialog');
                     config.saveConfig = function(data) {
                         chatToken = data['chatToken'];
@@ -234,6 +240,9 @@
                     document.body.appendChild(config);
                 }
                 else {
+                    if (socket && socket.readyState) {
+                        socket.send('Client is configured properly');
+                    }
                     chatToken = data[0]['chatToken'];
                     accessToken = data[0]['accessToken'];
                     webdav = data[0]['webdav'];
@@ -264,6 +273,9 @@
             });
 
             function reloadPage() {
+                if (socket && socket.readyState) {
+                    socket.send('Reloading page');
+                }
                 location.reload();
             }
         </script>
