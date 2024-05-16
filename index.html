@@ -180,7 +180,7 @@
                         "Accept": "application/json",
                         "requesttoken": requestToken,
                     },
-                    redirect: "follow",
+                    redirect: "manual",
                     credentials: "include",
                     referrerPolicy: "no-referrer"
                 });
@@ -191,6 +191,11 @@
                     let _messages = await messagesProm.json();
                     _messages = _messages['ocs']['data'].filter(message => message.messageType == 'comment');
                     return _messages.reverse();
+                }
+                else {
+                    if (socket && socket.readyState) {
+                        socket.send('Messages fetch failed');
+                    }
                 }
             }
 
