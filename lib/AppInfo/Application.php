@@ -28,11 +28,6 @@ namespace OCA\EasyTalk\AppInfo;
 use OCA\Talk\Events\ChatMessageSentEvent;
 use OCA\EasyTalk\Listener\MessageSentListener;
 
-use Ratchet\Server\IoServer;
-use Ratchet\Http\HttpServer;
-use Ratchet\WebSocket\WsServer;
-use OCA\EasyTalk\WebSocket\WebSocketServer;
-
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -49,33 +44,6 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(ChatMessageSentEvent::class, MessageSentListener::class);
 	}
 
-	private function isAddressInUse($address, $port) {
-	    $socket = @fsockopen($address, $port);
-	    if ($socket === false) {
-		return false; // Address is not in use
-	    } else {
-		fclose($socket);
-		return true; // Address is in use
-	    }
-	}
-
 	public function boot(IBootContext $context): void {
-		// server.php
-		$port = 8513;
-		if ($this->isAddressInUse('localhost', $port)) {
-			echo "Address is in use";
-		} else {
-			$server = IoServer::factory(
-				new HttpServer(
-				    new WsServer(
-					new WebSocketServer()
-				    )
-				),
-				$port
-			);
-
-			$server->run();
-
-		}
 	}
 }
