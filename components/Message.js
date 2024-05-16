@@ -162,6 +162,9 @@
             if (this.getAttribute('reactionsSelf').indexOf('👴') < 0) {
                 newMessageIndicator.textContent = 'NEU';
             }
+            else {
+                newMessageIndicator.textContent = '';
+             }
          }
          if (this.hasAttribute('content')) {
              let contentShow = false;
@@ -188,7 +191,11 @@
          if (fileParams.mimetype.indexOf("image") >= 0) {
              contentElement.style.backgroundImage = 'url("' + location.origin + '/index.php/core/preview?fileId=' + fileParams.id + '&y=' + fileParams.height / 2 + '&x=' + fileParams.width / 2 + '&a=true&etag=' + fileParams.etag + '")';
              contentShow = true;
-             contentElement.innerHTML = '';
+             if (this.getAttribute('content') !== '{file}') {
+                 contentElement.innerHTML = '<p>' + this.getAttribute('content') + '</p>';
+             } else {
+                 contentElement.innerHTML = '';
+             }
          } else if (fileParams.mimetype.indexOf("video") >= 0) {
              // login again?
              let videoURL = this.webdav + fileParams.path;
